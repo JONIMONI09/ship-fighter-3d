@@ -4,6 +4,10 @@ Browser-based 3D naval combat: command a battleship, fight escalating waves,
 manage leaks and flooding, and spend credits in the dockyard. three.js, ES
 modules, **zero build step**.
 
+[![Deploy to GitHub Pages](https://github.com/JONIMONI09/ship-fighter-3d/actions/workflows/pages.yml/badge.svg)](https://github.com/JONIMONI09/ship-fighter-3d/actions/workflows/pages.yml)
+[![Play live](https://img.shields.io/badge/play-live-brightgreen)](https://jonimoni09.github.io/ship-fighter-3d/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 **Official links**
 
 - Repository: <https://github.com/JONIMONI09/ship-fighter-3d>
