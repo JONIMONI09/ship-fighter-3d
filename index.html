@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>SCHIFFSBRUCH 3D · DOCKYARD</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<link rel="stylesheet" href="./css/styles.css">
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js"}}
+</script>
+</head>
+<body>
+<div id="hud">
+  <div class="panel" id="scoreBox">SCORE<b id="score">0</b><span id="hi">BEST 0</span></div>
+  <div class="panel" id="credBox">🪙 <span id="credits">0</span> CR</div>
+  <div class="panel" id="waveBox">WAVE <b id="waveN">–</b> · CONTACTS <b id="shipsLeft">0</b></div>
+  <div id="bossbar" class="hidden"><span id="bossName">BOSS</span><div class="bbar"><i id="bossFill"></i></div></div>
+  <div class="panel" id="hullBox">
+    <div class="barlbl">HULL <span id="hpTxt">100%</span></div><div class="bar"><i id="hullFill"></i></div>
+    <div class="barlbl">BUOYANCY <span id="buoyTxt">100%</span></div><div class="bar"><i id="buoyFill"></i></div>
+    <div class="barlbl">CREW <span id="crewTxt">100%</span></div><div class="bar"><i id="crewFill"></i></div>
+  </div>
+  <div id="crosshair"><span class="d"></span><span class="t1"></span><span class="t2"></span><span class="t3"></span><span class="t4"></span></div>
+  <div id="hitmark"><span class="h1"></span><span class="h2"></span></div>
+  <div id="reloadWrap"><i id="reloadFill"></i></div>
+  <div id="rangeTxt"></div>
+  <div id="wpanel">
+    <div class="slot active" id="s0" role="button" tabindex="0" aria-label="Weapon 1, main battery"><i class="cdf"></i><span class="k">1</span><span class="n">◆ HE SHELLS</span></div>
+    <div class="slot" id="s1" role="button" tabindex="0" aria-label="Weapon 2, machine gun"><i class="cdf"></i><span class="k">2</span><span class="n">⚙ MACHINE GUN</span></div>
+    <div class="slot" id="s2" role="button" tabindex="0" aria-label="Weapon 3, rocket pod"><i class="cdf"></i><span class="k">3</span><span class="n">➤ ROCKET POD</span></div>
+    <div id="dronesIco" role="button" tabindex="0" aria-label="Launch or recall drones">DRONES ◇ [E]</div>
+    <div id="dcIco" role="button" tabindex="0" aria-label="Toggle damage control">DC ○ OFF [R]</div>
+    <div id="hint">TAB Dockyard · I Card info · E Drone · MMB/RMB Zoom · R Damage Control · Wheel: Weapon</div>
+  </div>
+  <div id="mapWrap"><canvas id="minimap" width="170" height="170"></canvas><div id="spdTxt">0.0 kn · RUD ─</div></div>
+  <div id="killfeed"></div>
+  <div id="banner"><h2></h2><p></p></div>
+  <div id="zoomFrame"></div>
+  <div id="dmgflash"></div>
+  <div id="vignette"></div>
+</div>
+
+<div id="touchUI" class="hidden">
+  <div id="joyBase"><div id="joyKnob"></div></div>
+  <div id="btnFire" role="button" tabindex="0" aria-label="Fire">FIRE</div>
+  <div id="btnZoom" role="button" tabindex="0" aria-label="Toggle zoom">ZOOM</div>
+  <div id="btnDock" role="button" tabindex="0" aria-label="Open dockyard">DOCK</div>
+  <div id="btnMap" role="button" tabindex="0" aria-label="Open tactical map">MAP</div>
+</div>
+<div id="rotatePrompt" class="hidden"><div class="ph">📱</div><h2 style="margin-top:10px">ROTATE DEVICE</h2><p class="sub">Please turn your device to landscape</p></div>
+
+<div id="menu" class="overlay">
+  <h1>SCHIFFSBRUCH<span>3D · DOCKYARD</span></h1>
+  <p class="sub">Command your battleship · Turret salvos · Drones · Crafting</p>
+  <div class="ctr">
+    <div><b>W / S</b> Throttle / Reverse</div><div><b>A / D</b> Rudder</div>
+    <div><b>Mouse</b> Aim (all turrets)</div><div><b>LMB</b> Fire</div>
+    <div><b>1 / 2 / 3 · Wheel</b> Weapon</div><div><b>RMB hold / MMB</b> Zoom</div>
+    <div><b>E</b> Launch/recall drone</div><div><b>R</b> Damage control</div>
+    <div><b>TAB</b> Dockyard (craft!)</div><div><b>I</b> Hovered card info</div>
+    <div><b>M</b> Tactical map</div><div><b>E/F</b> Fleet orders (on map)</div><div><b>ESC</b> Pause</div>
+  </div>
+  <p class="tip">Your hull has <b style="color:var(--cyan)">4 buoyancy chambers</b> — hits open leaks, water floods in progressively, the ship lists &amp; sinks for real. Press <b style="color:var(--grn)">R</b> to pump &amp; repair — repairs <b>cost crew</b>, and a shorthanded crew reloads slower!<br>
+  Critical hits can start <b style="color:var(--red)">FIRES</b> aboard. Earn <b style="color:var(--grn)">CR</b>, upgrade in the <b style="color:var(--amber)">DOCKYARD [TAB]</b>: up to 4 turrets, armor, rockets, drones, engines, crew quarters.<br>
+  Every 5th wave: <b style="color:var(--red)">BOSS</b> — Heavy Cruiser (5) · Battleship with homing missile salvoes (10) · Carrier launching jet strikes (15). At wave 15+, a fully-upgraded fleet faces hardened <b style="color:var(--red)">ELITE</b> bosses. Torpedo boats launch real torpedoes — dodge!</p>
+  <button id="startBtn">▶ SET SAIL</button>
+  <p class="note">Desktop + mouse or touchscreen · Three.js via CDN</p>
+</div>
+<div id="tactMap" class="tactOverlay hidden">
+  <div class="tactHead">
+    <h2 class="tactTitle">🗺 TACTICAL MAP</h2>
+    <div class="tactMeta" id="tactInfo"></div>
+  </div>
+  <canvas id="tactCan"></canvas>
+  <!-- FIX: #36 — info & status side panel: click a ship, see its data,
+       switch AGGRESSIVE/AUTO/PASSIVE, hold or re-follow it here -->
+  <div class="tactSide">
+    <h3>📡 SHIP INFO &amp; STATUS</h3>
+    <div id="tactSel"><div class="name">NO SHIP SELECTED</div>
+      <div class="row"><b>Hint</b><span>click a friendly ship</span></div>
+      <div class="row"><b>Box-select</b><span>drag on the map</span></div>
+    </div>
+    <div class="tactFleet" id="tactFleetList"></div>
+  </div>
+  <div class="tactLegend">FRIENDLY = CYAN · SELECTED = GREEN · ENEMY = RED · BOSS = ORANGE</div>
+  <p class="tactTip">CLICK friendly = select · CLICK enemy = attack · SHIFT+CLICK = add · DRAG = box-select · E mode / F follow</p>
+</div>
+
+<div id="pause" class="overlay hidden"><h2>PAUSED</h2><p class="sub">Click to resume</p></div>
+<div id="over" class="overlay hidden"><h2 id="overTitle">SHIP SUNK</h2><div id="overStats"></div><button id="againBtn">TRY AGAIN</button></div>
+<div id="werft" class="overlay hidden">
+  <h2>⚓ DOCKYARD</h2>
+  <div id="werCred">🪙 0 CR</div>
+  <div id="shopTabs">
+    <button id="tabUpg"    class="shopTab">🛠 UPGRADES</button>
+    <button id="tabWeapon" class="shopTab">🔫 WEAPONS &amp; AMMO</button>
+    <button id="tabFleet"  class="shopTab">🚢 FLEET COMMAND</button>
+  </div>
+  <div id="panelUpg"    class="shopPanel"><div id="shop"></div></div>
+  <div id="panelWeapon" class="shopPanel hidden"><div id="weaponShop"></div></div>
+  <div id="panelFleet"  class="shopPanel hidden"><div id="fleetBay"></div></div>
+  <button id="werftX" title="Close (TAB)">✕</button>
+  <button id="werftClose">▶ RESUME [TAB]</button>
+</div>
+
+<div id="infoModal" class="overlay hidden">
+  <div id="infoCard">
+    <button id="infoX" title="Close (Esc)">✕</button>
+    <h2 id="infoTitle"></h2>
+    <div id="infoBody"></div>
+    <div class="infoBtns">
+      <button id="infoBuy" class="minibtn hidden">BUY</button>
+      <button id="infoClose" class="minibtn">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<div id="devpw" class="overlay hidden">
+  <h2>🔐 DEV ACCESS</h2>
+  <p class="sub">Enter dev password</p>
+  <input id="devpwIn" type="password" placeholder="PASSWORD" autocomplete="off"/>
+  <button id="devpwGo">UNLOCK</button>
+  <div id="devpwMsg"></div>
+</div>
+<div id="dev" class="overlay hidden">
+  <h2>⚙ DEV CONSOLE</h2>
+  <div id="devHead">
+    <button id="devReset">↺ RESET ALL DEFAULTS</button>
+    <button id="devRebind">⌨ REBIND TRIGGER KEYS</button>
+    <button id="devClose">✕ CLOSE</button>
+  </div>
+  <div id="devBody"></div>
+  <div id="devFoot">
+    <div class="pw"><input id="devNewPw" type="password" placeholder="NEW PASSWORD"/><button id="devSetPw">SET PW</button></div>
+    <div id="devMsg"></div>
+  </div>
+</div>
+
+<div id="crash" class="overlay hidden">
+  <h2>💥 CRASH</h2>
+  <p class="sub">Something went wrong — send this to the dev.</p>
+  <pre id="crashPre" class="crashLog"></pre>
+  <div id="crashHead">
+    <button id="crashCopy">📋 COPY ERROR</button>
+    <button id="crashReload">⟳ RELOAD GAME</button>
+  </div>
+</div>
+
+<script>
+/* Boot watchdog: if the CDN module never loads (offline/firewall), the game
+   module cannot show its crash screen. Surface the failure instead of a
+   silent black page. Run `node tools/vendor.mjs` for an offline copy. */
+window.__SB_BOOTED=false;
+setTimeout(function(){
+  if(window.__SB_BOOTED)return;
+  var pre=document.getElementById('crashPre'),c=document.getElementById('crash');
+  if(!pre||!c)return;
+  pre.textContent='BOOT FAILED\nthree.js could not be loaded.\nCheck the internet connection or run: node tools/vendor.mjs';
+  c.classList.remove('hidden');
+},7000);
+</script>
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>

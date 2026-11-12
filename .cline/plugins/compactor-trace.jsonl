@@ -1,0 +1,17 @@
+{"t":1789064871391,"ev":"run:start"}
+{"t":1789064871392,"ev":"tool","name":"run_commands","ok":false,"digest":"BLOCKED: Blocked 'taskkill /IM node.exe': it would kill Cline's own runtime. Kill spawned child processes by PID only."}
+{"t":1789064871393,"ev":"tool","name":"run_commands","ok":false,"digest":"BLOCKED: Blocked 'taskkill /IM node.exe': it would kill Cline's own runtime. Kill spawned child processes by PID only."}
+{"t":1789064871393,"ev":"tool","name":"run_commands","ok":false,"digest":"BLOCKED: Blocked: do not kill the Cline CLI process itself."}
+{"t":1789064871394,"ev":"tool","name":"editor","ok":true,"digest":""}
+{"t":1789064877413,"ev":"run:start"}
+{"t":1789064877414,"ev":"tool","name":"run_commands","ok":false,"digest":"BLOCKED: Blocked 'taskkill /IM node.exe': it would kill Cline's own runtime. Kill spawned child processes by PID only."}
+{"t":1789064877415,"ev":"tool","name":"run_commands","ok":false,"digest":"BLOCKED: Blocked 'taskkill /IM node.exe': it would kill Cline's own runtime. Kill spawned child processes by PID only."}
+{"t":1789064877415,"ev":"tool","name":"run_commands","ok":false,"digest":"BLOCKED: Blocked: do not kill the Cline CLI process itself."}
+{"t":1789064877416,"ev":"tool","name":"editor","ok":true,"digest":""}
+{"t":1789064930999,"ev":"run:start"}
+{"t":1789064931000,"ev":"tool","name":"run_commands","ok":false,"digest":"BLOCKED: Blocked 'taskkill /IM node.exe': it would kill Cline's own runtime. Kill spawned child processes by PID only."}
+{"t":1789064931001,"ev":"tool","name":"editor","ok":false,"digest":"{}"}
+{"t":1789064931001,"ev":"tool","name":"editor","ok":true,"digest":"fine"}
+{"t":1789064931001,"ev":"tool","name":"run_commands","ok":false,"digest":"BLOCKED: Blocked 'taskkill /IM node.exe': it would kill Cline's own runtime. Kill spawned child processes by PID only."}
+{"t":1789064931002,"ev":"tool","name":"run_commands","ok":false,"digest":"BLOCKED: Blocked: do not kill the Cline CLI process itself."}
+{"t":1789064931002,"ev":"tool","name":"editor","ok":true,"digest":""}

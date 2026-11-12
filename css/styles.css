@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap');
+:root{--amber:#ffb703;--red:#ef476f;--grn:#a7f439;--cyan:#4cc3ff}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a1420;font-family:'Rajdhani',sans-serif;user-select:none}
+canvas{display:block;touch-action:none}
+.hidden{display:none!important}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:5;color:#e8f1f8}
+.panel{position:absolute;background:rgba(6,14,26,.55);border:1px solid rgba(76,195,255,.35);padding:6px 14px;font-size:15px;letter-spacing:1px}
+#scoreBox{top:14px;left:14px}
+#scoreBox b{color:var(--amber);font-family:'Orbitron';font-size:20px;margin-left:8px}
+#credBox{top:64px;left:14px;color:var(--grn);font-family:'Orbitron';font-size:15px}
+#hi{opacity:.6;font-size:12px;margin-left:10px}
+#waveBox{top:14px;left:50%;transform:translateX(-50%);text-align:center}
+#waveBox b{color:var(--amber)}
+/* BOSS v2: boss health bar under the wave panel */
+#bossbar{position:absolute;top:64px;left:50%;transform:translateX(-50%);width:min(520px,60vw);text-align:center}
+#bossbar #bossName{font-family:'Orbitron';font-size:14px;letter-spacing:3px;color:var(--red);text-shadow:0 0 12px rgba(239,71,111,.6)}
+#bossbar .bbar{height:12px;margin-top:4px;background:rgba(255,255,255,.08);border:1px solid rgba(239,71,111,.5)}
+#bossbar .bbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#8c1c1c,var(--red));transition:width .2s}
+#bossbar.elite .bbar i{background:linear-gradient(90deg,#ff6a00,#ff3818)}
+#bossbar.elite #bossName{color:#ff3818;text-shadow:0 0 14px rgba(255,56,24,.8)}
+#hullBox{top:14px;right:14px;min-width:240px}
+.bar{height:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);margin:5px 0 4px}
+.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#06d6a0,var(--grn));transition:width .15s}
+#buoyFill{background:linear-gradient(90deg,#1e90ff,#4cc3ff)!important}
+#crewFill{background:linear-gradient(90deg,#b06a1e,#ffca4f)!important}
+#hullBox.low i#hullFill{background:linear-gradient(90deg,#8c1c1c,#ef476f)!important}
+.barlbl{font-size:11px;letter-spacing:2px;color:#9fb3c8}
+#crosshair{position:absolute;left:50%;top:50%;width:44px;height:44px;transform:translate(-50%,-50%);transition:transform .1s}
+#crosshair.kick{transform:translate(-50%,-50%) scale(1.3)}
+#crosshair .d{position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:var(--cyan)}
+#crosshair span{position:absolute;background:var(--cyan);opacity:.9}
+#crosshair .t1{left:50%;top:0;width:2px;height:11px;margin-left:-1px}
+#crosshair .t2{left:50%;bottom:0;width:2px;height:11px;margin-left:-1px}
+#crosshair .t3{top:50%;left:0;height:2px;width:11px;margin-top:-1px}
+#crosshair .t4{top:50%;right:0;height:2px;width:11px;margin-top:-1px}
+#hitmark{position:absolute;left:50%;top:50%;width:26px;height:26px;transform:translate(-50%,-50%) rotate(45deg);opacity:0;transition:opacity .25s}
+#hitmark span{position:absolute;background:#fff}
+#hitmark .h1{left:50%;top:0;width:2px;height:100%;margin-left:-1px}
+#hitmark .h2{top:50%;left:0;height:2px;width:100%;margin-top:-1px}
+#hitmark.show{opacity:1;transition:none}
+#reloadWrap{position:absolute;left:50%;top:calc(50% + 42px);transform:translateX(-50%);width:110px;height:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25)}
+#reloadFill{display:block;height:100%;width:100%;background:var(--cyan)}
+#rangeTxt{position:absolute;left:50%;top:calc(50% - 52px);transform:translateX(-50%);font-family:'Orbitron';font-size:13px;color:var(--cyan);letter-spacing:2px}
+#zoomFrame{position:absolute;inset:12px;border:2px solid rgba(76,195,255,.25);border-radius:6px;display:none}
+body.zoomed #zoomFrame{display:block}
+#killfeed{position:absolute;left:16px;bottom:248px;display:flex;flex-direction:column;gap:5px;max-width:400px;pointer-events:none;z-index:6}
+#killfeed div{background:rgba(6,14,26,.6);border-left:3px solid var(--amber);padding:4px 10px;font-size:14px;letter-spacing:.5px;animation:fIn .25s ease}
+#killfeed div.warn{border-left-color:var(--red);color:#ffb9c6}
+#killfeed div.good{border-left-color:var(--grn)}
+#killfeed div.info{border-left-color:var(--cyan)}
+@keyframes fIn{from{opacity:0;transform:translateX(-14px)}}
+#banner{position:absolute;left:50%;top:20%;transform:translateX(-50%);text-align:center;pointer-events:none;opacity:0}
+#banner h2{font-family:'Orbitron';font-size:44px;color:var(--amber);letter-spacing:6px;text-shadow:0 0 22px rgba(255,183,3,.5)}
+#banner p{font-size:16px;letter-spacing:3px;color:#cfd8e3;margin-top:4px}
+#banner.pop{animation:ban 2.6s ease forwards}
+@keyframes ban{0%{opacity:0;transform:translateX(-50%) scale(.8)}12%{opacity:1;transform:translateX(-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
+#dmgflash{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(200,20,20,.55));opacity:0;transition:opacity .5s}
+#vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 62%,rgba(0,0,10,.4))}
+#wpanel{position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:6px;z-index:7}
+.slot{display:flex;align-items:center;gap:10px;background:rgba(6,14,26,.6);border:1px solid rgba(76,195,255,.25);padding:6px 12px;min-width:250px;position:relative;overflow:hidden;pointer-events:auto;cursor:pointer}
+.slot.active{border-color:var(--amber);background:rgba(40,30,6,.6)}
+.slot .k{font-family:'Orbitron';color:var(--amber);width:18px;text-align:center}
+.slot .n{letter-spacing:1px;font-size:14px}
+.slot .cdf{position:absolute;left:0;top:0;bottom:0;background:rgba(76,195,255,.18);width:0}
+#dronesIco,#dcIco{background:rgba(6,14,26,.6);border:1px solid rgba(76,195,255,.25);padding:5px 12px;font-size:13px;letter-spacing:2px;color:var(--cyan);pointer-events:auto;cursor:pointer}
+#dcIco{color:#9fb3c8}
+#dcIco.on{border-color:var(--grn);color:var(--grn)}
+#hint{font-size:11px;letter-spacing:1px;color:#6f8397;padding-left:2px}
+#mapWrap{position:absolute;right:14px;bottom:14px;text-align:right}
+#minimap{border:1px solid rgba(76,195,255,.45);background:rgba(4,14,24,.85);display:block}
+#spdTxt{margin-top:5px;font-family:'Orbitron';font-size:14px;color:#cfe8ff;letter-spacing:2px;background:rgba(6,14,26,.6);padding:3px 8px;display:inline-block}
+.overlay{position:fixed;inset:0;z-index:20;background:rgba(4,12,22,.8);backdrop-filter:blur(5px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#e8f1f8;cursor:pointer;overflow-y:auto}
+.overlay h1{font-family:'Orbitron';font-size:52px;letter-spacing:8px;color:#fff}
+.overlay h1 span{color:var(--amber);margin-left:14px}
+.overlay h2{font-family:'Orbitron';font-size:36px;letter-spacing:4px;color:var(--cyan)}
+.overlay .sub{margin:8px 0 22px;font-size:16px;letter-spacing:2px;color:#9fb3c8}
+.ctr{display:grid;grid-template-columns:auto auto;gap:7px 34px;font-size:15px;margin-bottom:20px;letter-spacing:1px;text-align:left}
+.ctr b{color:var(--amber);margin-right:8px}
+.tip{max-width:620px;font-size:13.5px;color:#8fa2b5;margin-bottom:22px;line-height:1.55}
+.overlay button{pointer-events:auto;cursor:pointer;font-family:'Orbitron';font-size:18px;letter-spacing:3px;padding:12px 40px;background:transparent;color:var(--amber);border:2px solid var(--amber);transition:.15s;margin-top:14px}
+.overlay button:hover{background:var(--amber);color:#12202e}
+.note{margin-top:16px;font-size:12px;color:#5f7183;letter-spacing:1px}
+#overStats{font-size:18px;letter-spacing:2px;line-height:2;margin:12px 0 8px}
+#overStats b{color:var(--amber);font-family:'Orbitron'}
+#werft{cursor:default}
+#werftX{position:absolute;top:14px;right:18px;font-family:'Orbitron';font-size:26px;color:var(--red);background:transparent;border:2px solid var(--red);width:44px;height:44px;line-height:1;cursor:pointer;pointer-events:auto;transition:.12s}
+#werftX:hover{background:rgba(239,71,111,.25);color:#ffd7de}
+.shopPanel{max-width:96vw;overflow-x:auto;padding:0 4px}
+#shop{display:grid;grid-template-columns:repeat(auto-fit,210px);gap:12px;margin:14px 0;max-width:min(96vw,920px)}
+.item{background:rgba(10,22,36,.9);border:1px solid rgba(76,195,255,.3);padding:12px;text-align:left;cursor:pointer;transition:.12s;pointer-events:auto}
+.item:hover{border-color:var(--amber)}
+.item.max{opacity:.45;cursor:default;border-color:#3a4a5a}
+.item.poor{opacity:.55;cursor:default}
+.item h3{font-size:15px;letter-spacing:1px;color:#e8f1f8}
+.item p{font-size:12px;color:#8fa2b5;margin:5px 0 8px;min-height:32px;line-height:1.35}
+.item .cost{font-family:'Orbitron';font-size:14px;color:var(--grn)}
+.item .cost.no{color:var(--red)}
+.item .lvl{font-size:11px;color:var(--cyan);letter-spacing:2px;margin-top:4px}
+/* FIX: #24 FLEET COMMAND bay — registry purchases, per-ship upgrades, ammo pool */
+#fleetBay{display:grid;grid-template-columns:repeat(auto-fit,210px);gap:12px;margin:10px 0 4px;max-height:36vh;overflow-y:auto;padding-right:4px;width:100%;max-width:min(96vw,700px)}
+#fleetBay .regHead{grid-column:1/-1;font-family:'Orbitron';font-size:13px;letter-spacing:3px;color:var(--amber);margin-top:8px;border-bottom:1px solid rgba(76,195,255,.25);padding-bottom:4px}
+#fleetBay .regLocked{grid-column:1/-1;color:#7f93a8;font-size:13px;letter-spacing:1px;background:rgba(10,22,36,.7);border:1px dashed rgba(76,195,255,.3);padding:14px;text-align:center}
+#fleetBay .item p{min-height:0}
+/* FIX: #29 — dockyard tabs + fullscreen info modal */
+#shopTabs{display:flex;gap:8px;margin:6px 0 2px;flex-wrap:wrap;justify-content:center}
+.shopTab{pointer-events:auto;cursor:pointer;font-family:'Orbitron';font-size:14px;letter-spacing:2px;padding:8px 18px;background:transparent;color:#8fa2b5;border:1px solid rgba(76,195,255,.35);transition:.12s}
+.shopTab.on{background:rgba(40,30,6,.7);color:var(--amber);border-color:var(--amber)}
+.shopPanel{width:100%;max-height:30vh;overflow-y:auto;padding:2px 6px}
+#shop .regHead,#weaponShop .regHead{grid-column:1/-1;font-family:'Orbitron';font-size:13px;letter-spacing:3px;color:var(--amber);margin-top:6px;border-bottom:1px solid rgba(76,195,255,.25);padding-bottom:4px}
+#weaponShop{display:grid;grid-template-columns:repeat(auto-fit,210px);gap:12px;margin:10px 0 4px;width:100%;max-width:min(96vw,700px)}#weaponShop .item p{min-height:0}
+.cardBtns{display:flex;gap:6px;margin-top:6px;flex-wrap:nowrap}
+/* FIX: #33 — .overlay button (0,1,1) out-specified the plain .minibtn (0,1,0),
+   so every dockyard card button was forced to 18px/40px padding + 14px top
+   margin and the ℹ INFO button overlapped the price button (screenshot bug).
+   Scoping to #werft/#infoModal (1,1,0) restores the compact in-card buttons
+   WITHOUT touching the big overlay buttons. */
+#werft .minibtn,#infoModal .minibtn{pointer-events:auto;cursor:pointer;font-family:'Orbitron';font-size:12px;letter-spacing:1px;padding:4px 10px;background:transparent;color:var(--cyan);border:1px solid rgba(76,195,255,.5);transition:.12s;white-space:nowrap}
+#werft .minibtn:hover,#infoModal .minibtn:hover{background:var(--cyan);color:#12202e}
+#werft .minibtn.info,#infoModal .minibtn.info{color:var(--amber);border-color:rgba(255,183,3,.6)}
+#werft .minibtn.info:hover,#infoModal .minibtn.info:hover{background:rgba(255,183,3,.18);color:var(--amber)}
+#werft .minibtn.buy,#infoModal .minibtn.buy{color:var(--grn);border-color:rgba(80,220,120,.6)}
+#werft .minibtn.buy:hover,#infoModal .minibtn.buy:hover{background:var(--grn);color:#12202e}
+#werft .minibtn.buy.off,#infoModal .minibtn.buy.off,#werft .minibtn[disabled],#infoModal .minibtn[disabled]{opacity:.4;cursor:default}
+#werft .minibtn.buy.poor,#infoModal .minibtn.buy.poor{color:var(--red);border-color:rgba(255,90,74,.6)}
+.infoRow{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid rgba(76,195,255,.2);font-size:15px;color:#e8f1f8}
+.infoRow b{color:var(--amber);letter-spacing:1px}
+.infoRow span{color:#9fb3c8;text-align:right}
+/* FIX: #35 — #infoModal is now an invisible, click-through layer; the
+   info card itself is a small popover positioned over the trigger card
+   by showInfo() (no more fullscreen takeover of the dockyard). */
+#infoModal{cursor:default;background:transparent;backdrop-filter:none;pointer-events:none;overflow:visible}
+#infoCard{position:absolute;width:320px;max-width:88vw;background:linear-gradient(160deg,rgba(12,26,44,.97),rgba(8,18,32,.97));border:1px solid var(--amber);border-radius:10px;padding:14px 16px;text-align:left;pointer-events:auto;box-shadow:0 10px 34px rgba(0,0,0,.55),0 0 18px rgba(255,183,3,.15);animation:infoPop .16s ease-out}
+@keyframes infoPop{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+#infoX{position:absolute;top:6px;right:8px;background:transparent;border:0;color:var(--red);font-family:'Orbitron';font-size:15px;line-height:1;cursor:pointer;pointer-events:auto;padding:2px}
+#infoX:hover{color:#ffd7de}
+#infoCard h2{font-family:'Orbitron';font-size:15px;letter-spacing:1px;color:var(--cyan);margin-bottom:8px;padding-right:22px}
+#infoCard p{color:#9fb3c8;font-size:12.5px;line-height:1.45}
+#infoCard .infoRow{font-size:12.5px;padding:5px 0}
+/* FIX: #30 — tactical map overlay */
+.tactOverlay{position:fixed;inset:0;z-index:19;background:radial-gradient(ellipse at 50% 42%,rgba(10,30,52,.92) 0%,rgba(3,10,18,.97) 72%);display:flex;flex-direction:row;align-items:center;justify-content:center;gap:18px;color:#e8f1f8;padding:12px}
+.tactOverlay canvas{max-width:min(66vw,700px);max-height:min(74vh,700px);border:1px solid rgba(76,195,255,.4);border-radius:10px;box-shadow:0 0 26px rgba(20,60,110,.35);cursor:crosshair;background:#04101c}
+/* FIX: #36 — SHIP INFO & STATUS side panel (right of the map) */
+.tactSide{width:250px;max-height:min(74vh,700px);display:flex;flex-direction:column;gap:10px;text-align:left}
+.tactSide h3{font-family:'Orbitron';font-size:13px;letter-spacing:2px;color:var(--amber);border-bottom:1px solid rgba(255,183,3,.35);padding-bottom:5px;margin:0}
+#tactSel{background:rgba(10,22,36,.75);border:1px solid rgba(76,195,255,.35);border-radius:8px;padding:10px 12px;min-height:96px;font-size:12.5px;line-height:1.55;color:#cfe8ff}
+#tactSel .name{font-family:'Orbitron';font-size:13px;letter-spacing:1px;color:var(--cyan);margin-bottom:4px}
+#tactSel .row{display:flex;justify-content:space-between;gap:8px}
+#tactSel .row b{color:#9fb3c8;font-weight:normal}
+#tactSel .row span{color:#e8f1f8}
+#tactSel .btns{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+#tactSel .btns button{pointer-events:auto;cursor:pointer;font-family:'Orbitron';font-size:10.5px;letter-spacing:1px;padding:4px 10px;background:transparent;color:var(--amber);border:1px solid rgba(255,183,3,.55);transition:.12s}
+#tactSel .btns button:hover{background:rgba(255,183,3,.18)}
+#tactSel .btns button.on{background:var(--amber);color:#12202e}
+#tactSel .btns button.stop{color:var(--red);border-color:rgba(255,90,74,.55)}
+#tactSel .btns button.stop:hover{background:rgba(239,71,111,.2)}
+.tactFleet{background:rgba(10,22,36,.6);border:1px solid rgba(76,195,255,.25);border-radius:8px;padding:8px 10px;overflow-y:auto;flex:1;min-height:60px}
+.tactFleet .frow{display:flex;align-items:center;gap:7px;padding:3px 2px;font-size:11.5px;color:#9fb3c8;cursor:pointer;border-radius:4px}
+.tactFleet .frow:hover{background:rgba(76,195,255,.1)}
+.tactFleet .frow.sel{color:var(--grn)}
+.tactFleet .frow .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tactFleet .frow .hp{width:46px;text-align:right;font-family:'Orbitron';font-size:10px}
+.tactFleet .frow .bar{flex:0 0 56px;height:4px;background:rgba(76,195,255,.15);border-radius:2px;overflow:hidden}
+.tactFleet .frow .bar i{display:block;height:100%;background:var(--grn);border-radius:2px}
+.tactHead{display:flex;flex-direction:column;align-items:center;gap:4px;position:absolute;top:16px;left:0;right:0;pointer-events:none}
+.tactTitle{font-family:'Orbitron';font-size:26px;letter-spacing:5px;color:var(--cyan);text-shadow:0 0 18px rgba(76,195,255,.45)}
+.tactMeta{font-size:11.5px;letter-spacing:1px;color:#9fb3c8}
+.tactLegend{position:absolute;bottom:16px;left:0;right:0;text-align:center;font-size:11px;color:#7f93a8;pointer-events:none}
+.tactTip{position:absolute;bottom:34px;left:0;right:0;text-align:center;font-size:11px;color:#7f93a8;pointer-events:none}
+.infoBtns{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+#infoBuy{font-family:'Orbitron';font-size:14px;letter-spacing:2px;padding:8px 22px;color:var(--grn);border:2px solid rgba(80,220,120,.7)}
+#infoClose{font-family:'Orbitron';font-size:14px;letter-spacing:2px;padding:8px 22px;color:var(--red);border:2px solid rgba(255,90,74,.7)}
+#werCred{font-family:'Orbitron';font-size:22px;color:var(--grn);letter-spacing:2px}
+/* ==== DEV ==== */
+#devpw input,#dev input[type=password],#dev input[type=text]{
+  pointer-events:auto;background:rgba(6,14,26,.9);border:1px solid var(--cyan);color:#e8f1f8;
+  font-family:'Orbitron';font-size:16px;letter-spacing:2px;padding:10px 14px;text-align:center;outline:none}
+#devpwMsg{margin-top:10px;color:var(--red);font-size:14px;letter-spacing:2px;min-height:18px}
+#dev{cursor:default;align-items:stretch;justify-content:flex-start;padding:18px 24px}
+#dev h2{margin-bottom:6px}
+#devHead,#crashHead{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+#devHead button,#crashHead button{font-size:12px;padding:7px 14px;margin-top:0}
+#devBody{flex:1;overflow-y:auto;margin:12px auto;max-width:1060px;width:100%;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:8px;pointer-events:auto;padding:4px}
+.drow{background:rgba(10,22,36,.9);border:1px solid rgba(76,195,255,.25);padding:7px 10px;text-align:left}
+.drow.b{border-color:rgba(255,183,3,.5)}
+.drow label{display:flex;justify-content:space-between;font-size:12.5px;letter-spacing:1px;color:#9fb3c8;margin-bottom:4px}
+.drow label b{color:var(--amber);font-family:'Orbitron';font-size:12px}
+.drow input[type=range]{width:100%;pointer-events:auto;accent-color:#4cc3ff}
+.drow input[type=checkbox]{pointer-events:auto;transform:scale(1.4);accent-color:#ffb703}
+#devFoot{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;align-items:center}
+#devFoot .pw{display:flex;gap:6px;align-items:center}
+#devFoot .pw input{width:140px;padding:6px 8px;font-size:13px}
+#devFoot .pw button{font-size:11px;padding:6px 10px;margin-top:0}
+#devMsg{width:100%;text-align:center;color:var(--grn);font-size:13px;letter-spacing:1px;min-height:16px}
+.dgrptitle{grid-column:1/-1;font-family:'Orbitron';letter-spacing:3px;color:var(--cyan);font-size:13px;border-bottom:1px solid rgba(76,195,255,.3);padding:6px 2px 3px}
+/* ==== TOUCH ==== */
+#touchUI{position:fixed;inset:0;z-index:6;pointer-events:none}
+#joyBase{position:absolute;width:120px;height:120px;border:2px solid rgba(76,195,255,.5);border-radius:50%;
+  background:rgba(6,14,26,.35);pointer-events:none;display:none}
+#joyKnob{position:absolute;width:52px;height:52px;left:32px;top:32px;border-radius:50%;
+  background:rgba(76,195,255,.45);border:2px solid #9fe0ff}
+#btnFire{position:absolute;right:24px;bottom:96px;width:92px;height:92px;border-radius:50%;
+  border:2px solid var(--red);background:rgba(120,20,30,.5);color:#ffd7de;font-family:'Orbitron';
+  font-size:15px;letter-spacing:2px;display:flex;align-items:center;justify-content:center;
+  pointer-events:auto;touch-action:none}
+#btnFire:active{background:rgba(200,40,55,.7)}
+#btnZoom{position:absolute;right:130px;bottom:180px;width:60px;height:60px;border-radius:50%;
+  border:2px solid var(--cyan);background:rgba(6,14,26,.55);color:#bfe9ff;font-family:'Orbitron';
+  font-size:11px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;
+  pointer-events:auto;touch-action:none}
+#btnZoom.on{border-color:var(--amber);color:var(--amber)}
+#btnDock,#btnMap{position:absolute;right:24px;width:64px;height:40px;border:2px solid var(--cyan);
+  background:rgba(6,14,26,.6);color:#bfe9ff;font-family:'Orbitron';font-size:11px;letter-spacing:1px;
+  display:flex;align-items:center;justify-content:center;pointer-events:auto;touch-action:none}
+#btnDock{right:214px;bottom:96px}
+#btnMap{right:214px;bottom:144px}
+#hud [role="button"]:focus-visible,#touchUI [role="button"]:focus-visible,[role="button"]:focus-visible{
+  outline:2px solid var(--cyan);outline-offset:2px}
+#rotatePrompt{position:fixed;inset:0;z-index:40;background:rgba(4,12,22,.92);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;color:#e8f1f8;pointer-events:none}
+#rotatePrompt .ph{font-size:70px;line-height:1;animation:rot 1.6s ease-in-out infinite}
+@keyframes rot{0%,100%{transform:rotate(0)}50%{transform:rotate(90deg)}}
+@media (max-width:920px){
+  .panel{font-size:12px;padding:4px 8px}
+  #scoreBox b{font-size:15px}
+  #hullBox{min-width:150px}
+  .bar{height:7px;margin:3px 0 2px}
+  .barlbl{font-size:9.5px}
+  .slot{min-width:150px;padding:4px 8px}
+  .slot .n{font-size:11px}
+  .slot .k{width:14px;font-size:12px}
+  #dronesIco,#dcIco{font-size:10.5px;padding:4px 8px}
+  #killfeed{bottom:120px;max-width:250px;left:10px}
+  #killfeed div{font-size:11px;padding:3px 7px}
+  #banner h2{font-size:26px;letter-spacing:3px}
+  #banner p{font-size:12px}
+  #hint{display:none}
+  .ctr{font-size:12px;gap:5px 16px}
+  .overlay h1{font-size:30px;letter-spacing:4px}
+  .overlay h2{font-size:24px}
+  .tip{font-size:11.5px;max-width:92vw;padding:0 8px}
+  #shop{grid-template-columns:repeat(2,150px);gap:8px}
+#weaponShop{display:grid;grid-template-columns:repeat(2,150px);gap:8px}
+.shopTab{font-size:11px;padding:6px 12px}
+#infoCard{max-width:92vw;font-size:13px}
+/* FIX: #36 — tactical map stacks vertically on phones */
+.tactOverlay{flex-direction:column;gap:10px;overflow-y:auto}
+.tactSide{width:min(92vw,700px);max-height:none}
+.tactFleet{max-height:120px}
+.tactHead{position:static;pointer-events:auto}
+  .item{padding:8px}
+  .item p{min-height:44px;font-size:10.5px}
+  .item h3{font-size:12px}
+  .overlay button{font-size:14px;padding:10px 26px}
+}
+@media (max-width:600px){
+  #minimap{width:104px;height:104px}
+  #mapWrap{right:8px;bottom:8px}
+  #spdTxt{font-size:10.5px}
+  #wpanel{left:8px;bottom:8px;gap:4px}
+  #killfeed{bottom:150px}
+  #reloadWrap{width:74px;top:calc(50% + 30px)}
+  #rangeTxt{font-size:11px;top:calc(50% - 44px)}
+  #waveBox{max-width:200px;font-size:11px}
+  body.zoomed #zoomFrame{border-width:1px}
+  #devBody{max-width:94vw}
+  #crashPre{max-width:92vw;max-height:46vh}
+}
+@media (max-height:480px){
+  #btnFire{width:74px;height:74px;bottom:70px;right:18px}
+  #btnZoom{bottom:130px;right:104px;width:52px;height:52px}
+  #joyBase{width:100px;height:100px}
+  #joyKnob{width:44px;height:44px;left:27px;top:27px}
+}
+.crashLog{background:#15051f;color:#ffd9a0;font:12px/1.5 monospace;padding:12px;border:1px solid #ff5a4a;border-radius:8px;white-space:pre-wrap;overflow:auto;max-height:42vh}
+@media (max-height:480px){
+  #btnDock{bottom:70px;right:186px;width:58px;height:34px}
+  #btnMap{bottom:112px;right:186px;width:58px;height:34px}
+}
+@media (prefers-reduced-motion: reduce){
+  #banner,#crosshair,#hitmark,#dmgflash,#vignette{transition:none!important;animation:none!important}
+}
