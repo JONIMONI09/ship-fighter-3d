@@ -6,8 +6,8 @@ modules, **zero build step**.
 
 **Official links**
 
-- Repository: <https://github.com/JONIMONI09/SCHIFFSBRUCH>
-- Play online: <https://jonimoni09.github.io/SCHIFFSBRUCH/>
+- Repository: <https://github.com/JONIMONI09/ship-fighter-3d>
+- Play online: <https://jonimoni09.github.io/ship-fighter-3d/>
 
 ## Play
 
