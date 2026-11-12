@@ -4,7 +4,14 @@ Browser-based 3D naval combat: command a battleship, fight escalating waves,
 manage leaks and flooding, and spend credits in the dockyard. three.js, ES
 modules, **zero build step**.
 
+**Official links**
+
+- Repository: <https://github.com/JONIMONI09/SCHIFFSBRUCH>
+- Play online: <https://jonimoni09.github.io/SCHIFFSBRUCH/>
+
 ## Play
+
+Online via GitHub Pages (link above), or locally:
 
 ```
 node server.mjs          # http://localhost:8123/

@@ -1,9 +1,9 @@
 {
-  "name": "ship-fighter",
+  "name": "schiffsbruch",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "SCHIFFSBRUCH 3D - ship combat game (refactored multi-file build)",
+  "description": "SCHIFFSBRUCH — 3D naval survival game (three.js, no build step)",
   "scripts": {
     "start": "node server.mjs",
     "gates": "node tools/gates.mjs",
