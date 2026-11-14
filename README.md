@@ -1,4 +1,4 @@
-# SCHIFFSBRUCH — ship fighter
+# ship fighter
 
 Browser-based 3D naval combat: command a battleship, fight escalating waves,
 manage leaks and flooding, and spend credits in the dockyard. three.js, ES
